@@ -47,7 +47,7 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 ### Repo Details
 | Module  | RDK repo | Filepath/Filename  |
 | --- | --- | --- |
-| libdrm | https://code.rdkcentral.com/r/components/opensource/westeros  | files: xf86drm.h \n xf86drmMode.h \n westeros-gl.h |
+| libdrm | https://code.rdkcentral.com/r/components/opensource/westeros  | files: xf86drm.h; xf86drmMode.h |
 
 
 ### Acronyms, Terms and Abbreviations
