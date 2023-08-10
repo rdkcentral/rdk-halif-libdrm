@@ -4,7 +4,7 @@
 
 | Date | Author | Comment | Version |
 | --- | --------- | --- | --- |
-| 08/08/23 | Premium App Team | First Release | 0.0.1 |
+| 08/08/23 | Premium App Team | First Release | 1.0.0 |
 
 ## Table of Contents
 
