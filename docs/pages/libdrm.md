@@ -184,7 +184,8 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 
 1. Codeflow pre-playback:
 
-```
+```mermaid
+
 sequenceDiagram
 participant PremiumApp
 participant westeros-sink-soc
@@ -225,7 +226,8 @@ drm/westeros-gl->>libDRM:drmModeFreeProperty()/drmModeFreeObjectProperties()
 
 2. Codeflow during-playback:
 
-```
+```mermaid 
+
 sequenceDiagram
 participant PremiumApp
 participant westeros-sink-soc
@@ -270,4 +272,4 @@ drm/westeros-gl->>libDRM:drmModeRmFB
 
 ### Data Structures and Defines
 SoC vendors should refer to the header files under the 'include' directory for API implementation.
-Refer the '<a href="files.html">Files</a>' section: https://github.com/rdkcentral/avsync-halif/blob/rdk-dev/include/
+Refer the '<a href="files.html">Files</a>' section: https://github.com/rdkcentral/libdrm-halif/blob/rdk-dev/include/
