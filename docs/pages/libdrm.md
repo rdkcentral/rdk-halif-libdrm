@@ -62,10 +62,10 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 
 
 ### References
-[libdrm](https://github.com/Distrotech/libdrm)
-[Beyond Linux® From Scratch (System V Edition)](https://www.linuxfromscratch.org/blfs/view/svn/x/libdrm.html)
-[DRM Internals](https://www.kernel.org/doc/html/v4.11/gpu/drm-internals.html)
-[Direct Rendering Manager](https://man.archlinux.org/man/drm.7.en)
+1. [libdrm](https://github.com/Distrotech/libdrm)
+2. [Beyond Linux® From Scratch (System V Edition)](https://www.linuxfromscratch.org/blfs/view/svn/x/libdrm.html)
+3. [DRM Internals](https://www.kernel.org/doc/html/v4.11/gpu/drm-internals.html)
+4. [Direct Rendering Manager](https://man.archlinux.org/man/drm.7.en)
 
 
 ## Component Runtime Execution Requirements
