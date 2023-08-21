@@ -149,7 +149,8 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 ### Diagrams
 ### libdrm Code Flow
 
-``
+```mermaid
+
 sequenceDiagram
 participant Caller
 participant drm driver
@@ -159,7 +160,8 @@ Caller->>drm driver: drmModeGetEncoder
 Caller->>drm driver: drmModeFreeEncoder
 Caller->>drm driver: drmModeAddFB
 Caller->>drm driver: drmModeGetCrtc
-``
+
+```
 
 ### Data Structures and Defines
 SoC vendors should refer to the header files under the 'include' directory for API implementation.
