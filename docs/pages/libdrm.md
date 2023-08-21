@@ -40,6 +40,16 @@
 ## Description
 Libdrm is a library created to facilitate the interface of user-space programs with the DRM subsystem. This library is merely a wrapper that provides a function written in C for every ioctl of the DRM API, as well as constants, structures and other helper elements. The use of libdrm not only avoids exposing the kernel interface directly to applications, but presents the usual advantages of reusing and sharing code between programs.
 
+```mermaid
+flowchart TD
+    A[Audio Data] --> B[  App Src  ]
+    c[Video Data] --> B[  App Src  ] 
+    B -->|Video Data| D(Westeros Sink)
+    D <-->E(Westeros Sink Soc)
+    E <--> F(Westeros GL)
+    F --> |LibDRM calls| G(DRM)
+```
+
 ### Introduction
 
 In Westeros, the LibDRM module is responsible for managing the graphics and display hardware, providing a direct and efficient interface between the graphics hardware and the Westeros Renderer. This allows for efficient and high-performance rendering of graphical content and video streams, while also ensuring that the hardware is used in a secure and controlled manner. It provides a standardized interface for interacting with the graphics hardware, allowing the Westeros Renderer to access the hardware resources in a uniform and efficient manner. This helps to ensure that the graphics and video components of the system are properly synchronized and rendered in real-time.
@@ -54,6 +64,7 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 - `wst`    - westeros
 - `ctx`    - Context
 - `crtc`   - Cathode Ray Tube Controller
+- `Caller` - Any user of the interface
 
 
 ### References
@@ -150,7 +161,6 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 ### libdrm Code Flow
 
 ```mermaid
-
 sequenceDiagram
 participant Caller
 participant drm driver
@@ -160,7 +170,6 @@ Caller->>drm driver: drmModeGetEncoder
 Caller->>drm driver: drmModeFreeEncoder
 Caller->>drm driver: drmModeAddFB
 Caller->>drm driver: drmModeGetCrtc
-
 ```
 
 ### Data Structures and Defines
