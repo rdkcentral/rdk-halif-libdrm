@@ -38,7 +38,7 @@
 
 
 ## Description
-As the name suggestes, libdrm is a library created to facilitate the interface of user-space programs with the DRM subsystem. This library is merely a wrapper that provides a function written in C for every ioctl of the DRM API, as well as constants, structures and other helper elements. The use of libdrm not only avoids exposing the kernel interface directly to applications, but presents the usual advantages of reusing and sharing code between programs.
+Libdrm is a library created to facilitate the interface of user-space programs with the DRM subsystem. This library is merely a wrapper that provides a function written in C for every ioctl of the DRM API, as well as constants, structures and other helper elements. The use of libdrm not only avoids exposing the kernel interface directly to applications, but presents the usual advantages of reusing and sharing code between programs.
 
 ### Introduction
 
@@ -133,7 +133,7 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 
 ### Theory of operation and key concepts
 
-- LibDRM  is a kernel subsystem in linux that provides support for rendering graphics and managing display devices. It is reponsible for interacting with the graphics hardware and providing direct access to it. It enables hardware acceleration for video decoding and rendering. 
+- LibDRM  is a kernel subsystem in linux that provides support for rendering graphics and managing display devices. It is reponsible for interacting with the graphics hardware and providing direct access to it. It enables hardware acceleration for video decoding and rendering.
 
 - For video playback, the client application (like a media player) runs on top of the Wayland protocol communicating with the westeros-compositor. The compositor, in turn utuilizes the capabilities of this drm subsystem to facilitate efficient video rendering and display. The drm calls are made by the westeros-gl or westeros-sink-soc component.
 
@@ -149,7 +149,17 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 ### Diagrams
 ### libdrm Code Flow
 
-
+``
+sequenceDiagram
+participant Caller
+participant drm driver
+Caller->>drm driver: drmModeGetResources
+Caller->>drm driver: drmModeGetConnector
+Caller->>drm driver: drmModeGetEncoder
+Caller->>drm driver: drmModeFreeEncoder
+Caller->>drm driver: drmModeAddFB
+Caller->>drm driver: drmModeGetCrtc
+``
 
 ### Data Structures and Defines
 SoC vendors should refer to the header files under the 'include' directory for API implementation.
