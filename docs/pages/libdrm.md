@@ -2,15 +2,14 @@
 
 ## Version History
 
-| Date | Author | Comment | Version |
-| --- | --------- | --- | --- |
-| 08/08/23 | Premium App Team | First Release | 1.0.0 |
+| Date [DD/MM/YY] | Comment | Version |
+| --- | --- | --- |
+| 08/08/23 | First Release | 1.0.0 |
 
 ## Table of Contents
 
 - [Description](#description)
   - [Introduction](#introduction)
-  - [Repo Details](#repo-details)
   - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
   - [References](#references)
 - [Component Runtime Execution Requirements](#component-runtime-execution-requirements)
@@ -34,6 +33,7 @@
 - [Interface API Documentation](#interface-api-documentation)
   - [Theory of operation and key concepts](#theory-of-operation-and-key-concepts)
   - [Diagrams](#diagrams)
+   - [libdrm Code Flow](#libdrm-code-flow)
   - [Data Structures and Defines](#data-structures-and-defines)
 
 
@@ -42,30 +42,37 @@ Libdrm is a library created to facilitate the interface of user-space programs w
 
 ```mermaid
 flowchart TD
-    A[Audio Data] --> B[  App Src  ]
-    c[Video Data] --> B[  App Src  ] 
+subgraph Application-layer
+A[Audio Data]
+C[Video Data]
+end
+    A[Audio Data] --> B[App Src]
+    C[Video Data] --> B[App Src] 
+subgraph RDk-layer
     B -->|Video Data| D(Westeros Sink)
     D <-->E(Westeros Sink Soc)
     E <--> F(Westeros GL)
-    F --> |LibDRM calls| G(DRM)
+end
+subgraph SoC- layer
+    F --> |LibDRM calls| G(DRM driver)
+end
 ```
 
 ### Introduction
-
 In Westeros, the LibDRM module is responsible for managing the graphics and display hardware, providing a direct and efficient interface between the graphics hardware and the Westeros Renderer. This allows for efficient and high-performance rendering of graphical content and video streams, while also ensuring that the hardware is used in a secure and controlled manner. It provides a standardized interface for interacting with the graphics hardware, allowing the Westeros Renderer to access the hardware resources in a uniform and efficient manner. This helps to ensure that the graphics and video components of the system are properly synchronized and rendered in real-time.
-
 
 ### Acronyms, Terms and Abbreviations
 
 - `HAL`    - Hardware Abstraction Layer
 - `API`    - Application Programming Interface
+- `RDK`    - Reference Design Kit for All Devices
+- `SoC`    - System on Chip
 - `DRM`    - Direct Rendering Manager
 - `GPU`    - Graphics Processing Unit
 - `wst`    - westeros
 - `ctx`    - Context
 - `crtc`   - Cathode Ray Tube Controller
 - `Caller` - Any user of the interface
-
 
 ### References
 1. [http://dri.freedesktop.org/libdrm/](https://dri.freedesktop.org/libdrm/)
@@ -77,7 +84,6 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 
 ## Component Runtime Execution Requirements
 Video or graphics rendering is dependent on the capability of the connected GPU and if no video card is connected, an error will be returned. Each GPU detected by DRM is referred to as a DRM device, and a device file /dev/dri/cardX (where X is a sequential number) is created to interface with it. User-space programs that want to talk to the GPU must open this file and use ioctl calls to communicate with DRM. 
-
 
 ### Initialization and Startup
 The first call to the libdrm module would be drmSetMaster() to acquire the status of DRM master. IOCTL calls can only be invoked by the process considered the "master" of a DRM device, usually called DRM-Master. The display server is commonly the process that acquires the DRM-Master status in every DRM device it manages and keeps these privileges for the entire graphical session until it finishes or dies. 
@@ -92,14 +98,13 @@ There are several operations (ioctls) in the DRM API that either for security pu
 By using memory model, applications can allocate and manage memory resources for use by the graphics hardware in a safe and efficient manner. The libdrm API's provide a comprehensive set of functions for managing memory resources in the graphics stack, allowing applications to build high-performance graphics applications.
 
 ### Power Management Requirements
-The DRM module needs to implement power management techniques to optimize power consumption in devices. The driver should be designed to minimize power consumption during idle periods and use power-saving modes when appropriate.
+There is no requirement for the component to participate in power management. The driver should be designed to minimize power consumption during idle periods and use power-saving modes when appropriate.
 
 ### Asynchronous Notification Model
-drmHandleEvent: This call is used to handle events that are received by an application from the DRM module. It can be used to receive notifications of events such as hotplug, mode change, page flip, and VBlank events.
-
+- drmHandleEvent: This call is used to handle events that are received by an application from the DRM module. It can be used to receive notifications of events such as hotplug, mode change, page flip, and VBlank events.
 
 ### Blocking calls
-No blocking calls.
+There are no blocking calls for this interface.
 
 ### Internal Error Handling
 All the `APIs` must return error synchronously as a return argument. `HAL` is responsible for handling system errors (e.g. out of memory) internally.
@@ -112,7 +117,7 @@ There is no requirement for the interface to persist any setting information.
 ## Non-functional requirements
 
 ### Logging and debugging requirements
-This interface is required to support DEBUG, INFO and ERROR messages. ERROR logs should be enabled and INFO logs can be enabled. DEBUG should be disabled by default and enabled when required.
+This interface is required to support DEBUG, INFO and ERROR messages. ERROR logs should be enabled by default. DEBUG and INFO is required to be disabled by default and enabled when needed.
 
 ### Memory and performance requirements
 This interface is required to not cause excessive memory and CPU utilization. 
@@ -120,26 +125,26 @@ This interface is required to not cause excessive memory and CPU utilization.
 ### Quality Control
 
 - This interface is required to perform static analysis, our preferred tool is Coverity.
-- Open-source copyright validation is required to be performed, e.g.: Black duck, FossID.
-- Have a zero-warning policy with regards to compiling. All warnings are required to be treated as errors.
+- Have a zero-warning policy with regards to compiling. All warnings are required to be treated as error.
+- Copyright validation is required to be performed, e.g.: Black duck, FossID.
 - Use of memory analysis tools like Valgrind are encouraged, to identify leaks/corruptions.
-- Tests will endeavour to create worst case scenarios to assist investigations.
+- `HAL` Tests will endeavour to create worst case scenarios to assist investigations.
+- Improvements by any party to the testing suite are required to be fed back.
 
 ### Licensing
 The `HAL` implementation is expected to released under the Apache License 2.0.
 
 ### Build Requirements
-LibDRM code is downloaded from open source repo and build in platform to generate libdrm.so.
+LibDRM code is downloaded from open source repo and build in platform to generate libdrm.so shared library file.
 
 ### Variability Management
 Any changes in the `APIs` should be reviewed and approved by the component architects.
 
 ### Platform or Product Customization
-The DRM module is a critical component of modern graphics drivers, and SoC vendors can customize it in ways to meet the specific requirements of their hardware and software products. By customizing the DRM driver, APIs, modesetting, memory management and power management, SoC vendors can ensure that their graphics subsystem provides optimal performance, power efficiency, and feature support for their customers.
+No product customization is expected from SoC vendors from this module. Any potential platform specific customization needs to be communicated well in advance to the respective architect team for the purpose of effective planning.
 
 
 ## Interface API Documentation
-
 `API` documentation will be provided by Doxygen which will be generated from the header files.
 
 ### Theory of operation and key concepts
@@ -148,30 +153,19 @@ The DRM module is a critical component of modern graphics drivers, and SoC vendo
 
 - For video playback, the client application (like a media player) runs on top of the Wayland protocol communicating with the westeros-compositor. The compositor, in turn utuilizes the capabilities of this drm subsystem to facilitate efficient video rendering and display. The drm calls are made by the westeros-gl or westeros-sink-soc component.
 
-- During pre-playback scenario, after the compositor instance has been created and setting up of EGL is done, initializing of WstGLInit() takes place and further it gets WESTEROS_GL GRAPHICS_MAX_SIZE/FPS/DRM card. Then drm calls happens for getting encoder info, crtc properties, connector properties and getting plane resources/properties.
+- During pre-playback scenario, after the compositor instance has been created and setting up of EGL is done, initializing of Westeros-gl takes place and further it gets WESTEROS_GL GRAPHICS_MAX_SIZE/FPS/DRM card. Then drm calls happens for getting encoder info, crtc properties, connector properties and getting plane resources/properties.
 
-- During video-playback scenario, when video-server connection is established post initiliazation of display and video server, video resource id is set for this connection. Any existing overlay plane is freed and allocation of a new overlay plane happens for either graphics or primary video. Next setting of z-order for the respective video plane & video resource ID is done and session info is sent to video server by westeros-sink-soc to westeros-gl.
+- During video-playback scenario, when video-server connection is established post initialization of display and video server, video resource id is set for this connection. Any existing overlay plane is freed and allocation of a new overlay plane happens for either graphics or primary video. Next, setting of z-order for the respective video plane & video resource ID is done and session info is sent to video server by westeros-sink-soc to westeros-gl.
 
-- Westeros-gl gets frame and buffer related info and drm call drmPrimeFDToHandle() is made to drm driver. AV sync session is initialized and further video playback happens. Post EOS drmModeRmFB() destroys the given framebuffer. It is used to remove a framebuffer previously created with the drmModeAddFB function.
+- Westeros-gl gets frame and buffer related info and drm call drmPrimeFDToHandle() is made to drm driver. AV sync session is initialized and further video playback happens. Post EOS, drmModeRmFB() destroys the given framebuffer. It is used to remove a framebuffer previously created with the drmModeAddFB function.
 
 - At different stages during the overall lifecycle of a video playback, drm calls are made that communicates with the lower level drivers.
 
 
 ### Diagrams
-### libdrm Code Flow
 
-```mermaid
-sequenceDiagram
-participant Caller
-participant drm driver
-Caller->>drm driver: drmModeGetResources
-Caller->>drm driver: drmModeGetConnector
-Caller->>drm driver: drmModeGetEncoder
-Caller->>drm driver: drmModeFreeEncoder
-Caller->>drm driver: drmModeAddFB
-Caller->>drm driver: drmModeGetCrtc
-```
+#### libdrm Code Flow
+TBD
 
 ### Data Structures and Defines
-SoC vendors should refer to the header files under the 'include' directory for API implementation.
-Refer the '<a href="files.html">Files</a>' section: https://github.com/rdkcentral/libdrm-halif/blob/rdk-dev/include/
+SoC vendors should refer to the header files under the 'include' directory for API implementation: https://github.com/rdkcentral/libdrm-halif/tree/rdk-dev/include/
