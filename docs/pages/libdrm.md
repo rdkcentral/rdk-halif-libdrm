@@ -42,18 +42,18 @@ Libdrm is a library created to facilitate the interface of user-space programs w
 
 ```mermaid
 flowchart TD
-subgraph Application-layer
+subgraph Application Layer
 A[Audio Data]
 C[Video Data]
 end
     A[Audio Data] --> B[App Src]
     C[Video Data] --> B[App Src] 
-subgraph RDk-layer
+subgraph RDK Layer
     B -->|Video Data| D(Westeros Sink)
     D <-->E(Westeros Sink Soc)
     E <--> F(Westeros GL)
 end
-subgraph SoC- layer
+subgraph SoC Layer
     F --> |LibDRM calls| G(DRM driver)
 end
 ```
@@ -83,7 +83,7 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 
 
 ## Component Runtime Execution Requirements
-Video or graphics rendering is dependent on the capability of the connected GPU and if no video card is connected, an error will be returned. Each GPU detected by DRM is referred to as a DRM device, and a device file /dev/dri/cardX (where X is a sequential number) is created to interface with it. User-space programs that want to talk to the GPU must open this file and use ioctl calls to communicate with DRM. 
+Video or graphics rendering is dependent on the capability of the connected GPU and if no video card is connected, an error will be returned. Each GPU detected by DRM is referred to as a DRM device, and a device file /dev/dri/cardX (where X is a sequential number) is created to interface with it. User-space programs that want to talk to the GPU must open this file and use libdrm calls to communicate with DRM. 
 
 ### Initialization and Startup
 The first call to the libdrm module would be drmSetMaster() to acquire the status of DRM master. IOCTL calls can only be invoked by the process considered the "master" of a DRM device, usually called DRM-Master. The display server is commonly the process that acquires the DRM-Master status in every DRM device it manages and keeps these privileges for the entire graphical session until it finishes or dies. 
@@ -111,7 +111,7 @@ All the `APIs` must return error synchronously as a return argument. `HAL` is re
 libdrm calls return 0 if successful, or -1 otherwise.
 
 ### Persistence Model
-There is no requirement for the interface to persist any setting information.
+There is no requirement for the interface to persist any settings information.
 
 
 ## Non-functional requirements
@@ -161,6 +161,7 @@ No product customization is expected from SoC vendors from this module. Any pote
 
 - At different stages during the overall lifecycle of a video playback, drm calls are made that communicates with the lower level drivers.
 
+TBD - List down the mandatory libdrm calls
 
 ### Diagrams
 
