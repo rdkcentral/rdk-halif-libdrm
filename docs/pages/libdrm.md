@@ -86,7 +86,7 @@ In Westeros, the LibDRM module is responsible for managing the graphics and disp
 Video or graphics rendering is dependent on the capability of the connected GPU and if no video card is connected, an error will be returned. Each GPU detected by DRM is referred to as a DRM device, and a device file /dev/dri/cardX (where X is a sequential number) is created to interface with it. User-space programs that want to talk to the GPU must open this file and use libdrm calls to communicate with DRM. 
 
 ### Initialization and Startup
-The first call to the libdrm module would be drmSetMaster() to acquire the status of DRM master. IOCTL calls can only be invoked by the process considered the "master" of a DRM device, usually called DRM-Master. The display server is commonly the process that acquires the DRM-Master status in every DRM device it manages and keeps these privileges for the entire graphical session. A process can also give up its master role—and let another process acquire it by calling the drmDropMaster() API.
+The first call to the libdrm module would be drmSetMaster() to acquire the status of DRM master. IOCTL calls can only be invoked by the process considered the "master" of a DRM device, usually called DRM-Master. The display server is commonly the process that acquires the DRM-Master status in every DRM device it manages and keeps these privileges for the entire graphical session. A process can also give up its master role and let another process acquire it by calling the drmDropMaster() API.
 
 ### Threading Model
 HAL is expected to be thread safe. Any caller invoking the APIs should ensure calls are made in a thread safe manner.
