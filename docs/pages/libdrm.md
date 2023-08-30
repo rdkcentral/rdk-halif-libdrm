@@ -4,7 +4,6 @@
 
 | Date [DD/MM/YY] | Comment | Version |
 | --- | --- | --- |
-| /08/23 | Initial review fixes	| 1.0.1 |
 | 08/08/23 | First Release | 1.0.0 |
 
 ## Table of Contents
@@ -61,7 +60,6 @@ style B fill:#fcc,stroke:#333
 
 - `HAL`    - Hardware Abstraction Layer
 - `API`    - Application Programming Interface
-- `RDK`    - Reference Design Kit for All Devices
 - `SoC`    - System on Chip
 - `DRM`    - Direct Rendering Manager
 - `LibDRM` - Direct Rendering Manager Library
