@@ -38,15 +38,16 @@
 
 ## Acronyms, Terms and Abbreviations
 
-- `HAL`    - Hardware Abstraction Layer
-- `API`    - Application Programming Interface
-- `SoC`    - System on Chip
-- `DRM`    - Direct Rendering Manager
-- `LibDRM` - Direct Rendering Manager Library
-- `GPU`    - Graphics Processing Unit
-- `crtc`   - cathod ray tube controller
-- `IOCTL`  -  Input-Output Control
-- `Caller` - Any user of the interface
+- `HAL`       - Hardware Abstraction Layer
+- `API`       - Application Programming Interface
+- `SoC`       - System on Chip
+- `DRM`       - Direct Rendering Manager
+- `LibDRM`    - Direct Rendering Manager Library
+- `GPU`       - Graphics Processing Unit
+- `CRTC`      - cathod ray tube controller
+- `DRM plane` - represents a layer of graphics that can be displayed on a `CRTC`
+- `IOCTL`     - Input-Output Control
+- `Caller`    - Any user of the interface
 
 
 ## Description
@@ -148,33 +149,31 @@ The `caller` is expected to have complete control over calling the `LibDRM` `API
 - There are several operations (`IOCTLs`) in the `DRM` `API` that either for security purposes or for concurrency issues must be restricted to be used by a single user-space process per device. To implement this restriction, `DRM` limits such `IOCTLs` to be only invoked by the process considered the "master" of a `DRM` device (DRM-Master). 
 - Only one of the processes that have the device node (/dev/dri/cardX) opened will have its file handle marked as master, specifically the first one calling the `drmSetMaster()` `API`. Any attempt to use one of these restricted `IOCTLs` without being the DRM-Master will return an error.
 
-2. `Caller` shall call `drmGetVersion()` `API` to query the driver version information with the file descriptor of the `DRM` device as an argument and returns pointer to the `drmVersion` structure which should be freed with `drmFreeVersion()`.
+2. `Caller` shall call `drmGetVersion()` to query the driver version information with the file descriptor of the `DRM` device as an argument and returns pointer to the `drmVersion` structure which should be freed with `drmFreeVersion()`.
 
-3. The next step is to call `drmModeGetResources()` and get all the `drmModeRes` resources (includes fb, crtc, encoder, connector, etc). While `drmModeFreeResources()` call is used to free the memory allocated by a previous call. 
+3. `Caller` shall call `drmModeGetResources()` to get all the `drmModeRes` resources (includes fb, `CRTC`, encoder, connector, etc). `drmModeFreeResources()` is used to free the memory allocated.
 
-- When `caller` needs to interact with the `DRM` kernel subsystem for rendering, display, and other graphics-related functionality, it must first obtain a handle to the `DRM` device and retrieve the available resources using `drmModeGetResources()`. Once the necessary information is retrieved, and after it is used, `drmModeFreeResources()` should be called to release the allocated resources to prevent memory leaks.
+- When a `caller` needs to interact with the `DRM` kernel subsystem for rendering, display, and other graphics-related functionality, it shall first obtain a handle to the `DRM` device and retrieve the available resources using `drmModeGetResources()`. `drmModeFreeResources()` should be called to release the allocated resources to prevent memory leaks.
 
-4. Next call `drmModeGetConnector()`, get the first connected connector(DRM_MODE_CONNECTED). `drmModeConnector()` stores all the supporting mode, choose one from them. 
+4. The `caller` shall call `drmModeGetConnector()` to get the first connected connector(DRM_MODE_CONNECTED). `drmModeConnector()` stores all the supporting mode.
 
-- `drmModeGetConnector()` is for connector manipulation and retrieves all information about the connector connectorId. While `drmModeFreeConnector()` call is used to free the memory allocated to a `drmModeConnector` structure returned by the `drmModeGetConnector()` function.
+- `drmModeGetConnector()` is a connector function that retrieves all information about the connector. `drmModeFreeConnector()` is used to free the memory allocated to a `drmModeConnector` structure returned by `drmModeGetConnector()`.
 
-5. Next call `drmModeGetEncoder()`. If the encoder matches with the selected mode, save the `drmModeModeInfo` for later use. 
+5. The `caller` shall call `drmModeGetEncoder()`. If the encoder matches with the selected mode, save the `drmModeModeInfo` for later use. 
 
-- `drmModeGetEncoder()` call is an Encoder function and is used to retrieve an encoder object associated with a given encoder id. The function returns a pointer to a `drmModeEncoder` structure that contains information about the encoder. While `drmModeFreeEncoder()` call is used to free the resources allocated for an encoder structure previously allocated with `drmModeGetEncoder()`.
+- `drmModeGetEncoder()` is an encoder function and is used to retrieve an encoder object associated with a given encoder id. The function returns a pointer to a `drmModeEncoder` structure that contains information about the encoder. `drmModeFreeEncoder()` is used to free the resources allocated.
 
-6. `Caller` gets original display mode by calling `drmModeGetCrtc()`, this will be used after program exit to restore the original mode. `drmModeGetCrtc()` call is a `crtc` function and retrieves information about the crtcId. While `drmModeFreeCrtc()` call is used to free the resources allocated for a `crtc`. The resources may include memory allocation or any associated properties.
+6. The `caller` gets the display mode information for a `CRTC` by calling `drmModeGetCrtc()`. `Caller`  shall use `drmModeSetCrtc()` to set the display mode information for a `CRTC`. `drmModeFreeCrtc()` shall be used to free the resources allocated for a `CRTC`. The resources may include memory allocation or any associated properties.
 
-7. `drmModeObjectGetProperties()` is called to retrieve the properties of a `DRM` object associated with a `DRM` plane that has a given objectId and objectType. While `drmModeFreeObjectProperties()` call is used to free the memory allocated by `drmModeObjectGetProperties()` when retrieving properties for a `DRM` object.
+7. `drmModeObjectGetProperties()` retrieves the properties of a `DRM` object associated with a `DRM plane`. `drmModeFreeObjectProperties()` frees the memory allocated by `drmModeObjectGetProperties()`.
 
-8. `drmModeGetPlaneResources()` call retrieves a list of available planes in the system. This `API` can allow the `caller` to obtain information about the available planes and their capabilities. While `drmModeFreePlaneResources()` call frees the memory allocated by `drmModeGetPlaneResources()` `API`.
+8. `drmModeGetPlaneResources()` retrieves a list of available `DRM planes` in the system with their capabilities. `drmModeFreePlaneResources()` frees the allocated memory.
 
-9. `drmPrimeFDToHandle()` is called to obtain the handle to use the buffer. Next `drmModeAddFB()` is called which will create a new framebuffer with the buffer object as its scanout buffer. `drmPrimeHandleToFD()` `API` is called to import this buffer for rendering. 
+9. `drmPrimeFDToHandle()` returns the handle for the dma-buf file descriptor provided. `drmPrimeHandleToFD()` returns the dma-buf file descriptor for the handle provided.
 
-10. `drmModeSetCrtc()` is called with frame buffer id, the buffer object attached with the FB is outputed to display. This function is a `crtc` function and sets the mode on a `crtc` crtcId with the given mode modeId.
+10. `drmModeAddFB()` create a new framebuffer with the buffer object as its scan out buffer. `drmModeRmFB()` destroys the framebuffer allocated by `drmModeAddFB()`. `Caller` will `close()` the DRM device when EOS is reached.
 
-11. `drmModeRmFB()` `API` destroys the given framebuffer. It is used to remove the framebuffer previously created with the `drmModeAddFB()` function. `Caller` will `close()` the DRM device when EOS is reached.
-
-- Page flip uses double buffer mechanisam, that can be used to avoid flicker. Two frame buffers are created, each associated a buffer object. The buffer object being drawn is not the same buffer object being displayed. The `caller` maintains two frame buffers. Picture is drawn on current frame buffer, and `drmModePageFlip()` is called to send another frame buffer to `crtc` when vblank comes. Two frame buffers are switched in this way.
+- `drmModePageFlip()` does a page flip (framebuffer change) on the specified `CRTC`. By default, the `CRTC` will be reprogrammed to display the specified framebuffer after the next vertical refresh.
 
 - Following are the 38 mandatory `LibDRM` `API` calls for `SoC` Implementation:
 
@@ -221,6 +220,12 @@ SoC DRM Driver-->>Caller:return 0
 Caller->>SoC DRM Driver:drmPrimeHandleToFD
 SoC DRM Driver-->>Caller:return 0
 Caller->>SoC DRM Driver:drmModeSetCrtc
+SoC DRM Driver-->>Caller:return 0
+
+Note over Caller: on refreshing page
+Caller->>SoC DRM Driver:drmModePageFlip
+SoC DRM Driver-->>Caller:return 0
+Caller->>SoC DRM Driver:drmModeSetPlane
 SoC DRM Driver-->>Caller:return 0
 
 Note over Caller: on EOS
