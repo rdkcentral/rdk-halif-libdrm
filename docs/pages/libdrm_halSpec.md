@@ -94,7 +94,7 @@ The `LibDRM` `HAL` will own any memory that it creates and will also be responsi
 This interface is not required to be involved in power management. In general, the `SoC` `DRM` driver should be designed to minimize the power consumption of the device.
 
 ### Asynchronous Notification Model
-`drmHandleEvent()` call is used to handle events that are received by the `caller` from the `DRM` module. It can be used to receive notifications of events such as hotplug, mode change, page flip, and VBlank events.
+`drmHandleEvent()` is used to handle events that are received by the `caller` from the `DRM` module. Required supported event is page flip event.
 
 ### Blocking calls
 There are no blocking calls for this interface.
@@ -215,14 +215,20 @@ SoC DRM Driver-->>Caller:returns pointer to plane resources
 Note over Caller: get frame and buffer related info
 Caller->>SoC DRM Driver:drmPrimeFDToHandle
 SoC DRM Driver-->>Caller:return 0
-Caller->>SoC DRM Driver:drmModeAddFB
+Caller->>SoC DRM Driver:drmModeAddFB2
 SoC DRM Driver-->>Caller:return 0
 Caller->>SoC DRM Driver:drmPrimeHandleToFD
 SoC DRM Driver-->>Caller:return 0
-Caller->>SoC DRM Driver:drmModeSetCrtc
+
+Note over Caller: when video plane's Last Frame flag is not set
+Caller->>SoC DRM Driver:drmModeSetPlane
 SoC DRM Driver-->>Caller:return 0
 
 Note over Caller: on refreshing page
+Caller->>SoC DRM Driver:drmModeAddFB
+SoC DRM Driver-->>Caller:return 0
+Caller->>SoC DRM Driver:drmModeSetCrtc
+SoC DRM Driver-->>Caller:return 0
 Caller->>SoC DRM Driver:drmModePageFlip
 SoC DRM Driver-->>Caller:return 0
 Caller->>SoC DRM Driver:drmModeSetPlane
