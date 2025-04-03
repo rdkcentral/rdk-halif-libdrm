@@ -1,11 +1,5 @@
 # LibDRM
 
-## Version History
-
-| Date [DD/MM/YY] | Comment | Version |
-| --- | --- | --- |
-| 08/08/23 | First Release | 1.0.0 |
-
 ## Table of Contents
 
 - [Acronyms, Terms and Abbreviations](#acronyms-terms-and-abbreviations)
@@ -13,7 +7,7 @@
   - [Introduction](#introduction)
   - [References](#references)
 - [Component Runtime Execution Requirements](#component-runtime-execution-requirements)
-  - [Initialization and Startup](#initializatio-and-startup)
+  - [Initialization and Startup](#initialization-and-startup)
   - [Threading Model](#threading-model)
   - [Process Model](#process-model)
   - [Memory Model](#memory-model)
@@ -35,7 +29,6 @@
   - [Diagrams](#diagrams)
     - [General LibDRM Code Flow](#general-libdrm-code-flow)
 
-
 ## Acronyms, Terms and Abbreviations
 
 - `HAL`       - Hardware Abstraction Layer
@@ -49,7 +42,6 @@
 - `DRM-Master` - master of a `DRM` device
 - `IOCTL`     - Input-Output Control
 - `Caller`    - Any user of the interface
-
 
 ## Description
 
@@ -75,7 +67,6 @@ style B fill:#fcc,stroke:#333
 ### References
 
 Documentation on DRM driver details - [DRM Internals](https://www.kernel.org/doc/html/v5.4/gpu/drm-internals.html "DRM Internals")
-
 
 ## Component Runtime Execution Requirements
 
@@ -119,7 +110,6 @@ All the `APIs` must return error synchronously as a return argument. `HAL` is re
 
 There is no requirement for the interface to persist any settings information.
 
-
 ## Non-functional requirements
 
 ### Logging and debugging requirements
@@ -128,7 +118,7 @@ This interface is required to support DEBUG, INFO and ERROR messages. ERROR logs
 
 ### Memory and performance requirements
 
-This interface is required to not cause excessive memory and CPU utilization. 
+This interface is required to not cause excessive memory and CPU utilization.
 
 ### Quality Control
 
